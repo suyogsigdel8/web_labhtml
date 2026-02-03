@@ -10,7 +10,7 @@ body{
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: black;
+    
 }
 .container{
     display: flex;
@@ -27,7 +27,7 @@ display: flex;
 align-items: center;
 flex-direction: column;
 gap:30px;
-color:#fff;
+color:black;
 border-radius: 20px;
 box-shadow:0 0 100px rgba(0,0,0,0.5);
 border:3px solid rgba(255,255,255,0.18);
