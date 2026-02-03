@@ -1,36 +1,68 @@
-$(document).ready(function () {
-    loadTasks();
-});
+document.addEventListener('DOMContentLoaded',()=>{
+    const taskInput = document.getElementById('task-input');
+    const addTaskBtn = document.getElementById('add-task-btn');
+    const taskList = document.getElementById('task-list');
+     const emptyImage=document.querySelector('.empty-image');
+     const todoscontainer =document.querySelector('todos-container');
+     const toggleEmptyState = () => {
+        emptyImage.style.display = taskList.children.length === 0 ? 'block' :'none';
+        todoscontainer.style.width = taskList.children.length > 0 ?'100%': '50%';
+     }
+    const addTask = (text,completed =false) =>{
+        
+        const taskText =text || taskInput.value.trim();
+        if(!taskText){
+            return;
+        }
+        const li=document.createElement('li');
+        li.innerHTML =`
+        <input type="checkbox" class="checkbox" ${completed ? 'checked': ''}/>
+        <span>${taskText}</span>
+        <div class="task-buttons">
+            <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
+            <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        `;
+        const checkbox=li.querySelector('.checkbox');
+        const editBtn = li.querySelector('.edit-btn');
+        if(completed){
+            li.classList.add('completed');
+            editBtn.disabled= true;
+            editBtn.style.opacity='0.5';
+            editBtn.style.pointerEvents='none';
+        }
+        checkbox.addEventListener('change',()=>{
+              const ischecked =checkbox.checked;
+              li.classList.toggle('completed',ischecked);
+              editBtn.disabled = ischecked;
+              editBtn.style.opacity= ischecked ? '0.5':'1';
+              editBtn.style.pointerEvents= ischecked ? 'none':'auto';
+        });
+        editBtn.addEventListener('click', () =>{
+              if(!checkbox.checked){
+                taskInput.value= li.querySelector('span').textContent;
+                li.remove();
+                toggleEmptyState();
+              }
+        });  
 
-function loadTasks() {
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    $("#taskList").empty();
-    tasks.forEach(function (task, index) {
-        $("#taskList").append(`
-            <li>
-                ${task}
-                <button onclick="deleteTask(${index})">X</button>
-            </li>
-        `);
+
+        li.querySelector('.delete-btn').addEventListener('click',() =>{
+                 li.remove();
+                 toggleEmptyState(); 
+        });
+        taskList.appendChild(li);
+        taskInput.value='';
+        toggleEmptyState();
+    };
+    addTaskBtn.addEventListener('click',(e) =>{
+        e.preventDefault();
+        addTask();
     });
-}
-$("#addTask").click(function () {
-    let task = $("#taskInput").val();
-    if (task === "") return;
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-    tasks.push(task);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    $("#taskInput").val("");
-    loadTasks();
-});
-function deleteTask(index) {
-    let tasks = JSON.parse(localStorage.getItem("tasks"));
-    tasks.splice(index, 1);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    loadTasks();
-}
-$("#taskInput").keypress(function (e) {
-    if (e.key === "Enter") {
-        $("#addTask").click();
-    }
+    taskInput.addEventListener('keypress',(e) =>{
+        if(e.key ==='Enter'){
+          e.preventDefault();  
+          addTask();
+        }
+    });
 });
